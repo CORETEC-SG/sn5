@@ -48,8 +48,10 @@ RUN mkdir -p $HOME/elasticsearch && \
     sed -i '$ a\path.repo: /home/appuser/esbackup' $HOME/elasticsearch/elasticsearch-8.14.2/config/elasticsearch.yml
 
 # Copy the pre-installed ventor file data to elasticsearch database
-COPY data/esbackup.tar.gz $HOME/esbackup.tar.gz
-RUN tar -xzf $HOME/esbackup.tar.gz && \
+COPY data/esbackup_*.tar.gz $HOME/
+RUN cat $HOME/esbackup_*.tar.gz > $HOME/esbackup.tar.gz && \
+    tar -xf $HOME/esbackup.tar.gz && \
+    rm $HOME/esbackup_*.tar.gz && \
     rm $HOME/esbackup.tar.gz
 
 # install SN5

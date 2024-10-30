@@ -1,0 +1,65 @@
+# .github/workflows/deploy-to-runpod.yml
+name: Deploy to RunPod
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch; adjust as needed
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+      # Step 3: Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest" .
+
+      # Step 4: Push Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest"
+
+      # Step 5: Deploy to RunPod
+      - name: Deploy to RunPod
+        env:
+          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+          DOCKER_IMAGE: "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest"
+        run: |
+          # Define the payload for the RunPod API request
+          read -r -d '' PAYLOAD << EOF
+          {
+            "image": "${DOCKER_IMAGE}",
+            "instance_type": "cpu",  # Example instance type, adjust as needed
+            "environment_variables": {
+              "MINER_ID"="default",
+              "WALLET_NAME"="test",
+              "OPENAI_API_KEY"="123456"
+            },
+            "command": "",  # Modify to fit your app's entry point
+            "ports": [
+              {
+                "container_port": 70000,
+                "host_port": 70000
+              }
+            ]
+          }
+          EOF
+
+          # Make API call to RunPod to start the container
+          curl -X POST "https://api.runpod.io/v1/pods" \
+            -H "Authorization: Bearer $RUNPOD_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"

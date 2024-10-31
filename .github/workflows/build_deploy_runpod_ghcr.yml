@@ -1,0 +1,53 @@
+# .github/workflows/deploy-to-runpod.yml
+name: Build/Push Docker with GHCR, Deploy to Runpod
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        required: true
+        description: log_level
+        default: warning
+      tags:
+
+jobs:
+  build_and_push:
+    environment: env
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: sn5_app
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:1.0.0
+
+      # Step 1: Deploy to RunPod
+      - name: Deploy to RunPod
+        env:
+          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+          RUNPOD_TEMPLATE_ID: ${{ vars.RUNPOD_TEMPLATE_ID }} 
+        run: |
+           echo "Deploy started"
+           # Define the payload for the RunPod API request
+           # Make API call to RunPod to start the container
+           curl -X POST https://api.runpod.io/graphql?api_key=${RUNPOD_API_KEY} \
+           -H "content-type: application/json" \
+           -d '{"query": " mutation { deployCpuPod( input: { cloudType: SECURE, containerDiskInGb: 10, dataCenterId: null, instanceId: \"cpu3c-2-4\", networkVolumeId: null, startJupyter: true, startSsh: true, templateId: \"${{env.RUNPOD_TEMPLATE_ID}}\", volumeKey: null, env: [{key: \"a\", value: \"1\"}, {key: \"b\", value: \"2\"}] }) { id, machineId }}"}'

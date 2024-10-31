@@ -1,5 +1,5 @@
 # .github/workflows/deploy-to-runpod.yml
-name: Build/Push Docker then Deploy to Runpod
+name: Build/Push Docker, Deploy to Runpod
 
 on:
   push:

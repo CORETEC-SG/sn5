@@ -1,0 +1,51 @@
+# .github/workflows/deploy-to-runpod.yml
+name: Build/Push Docker, Deploy to Runpod
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        required: true
+        description: log_level
+        default: warning
+      tags:
+
+jobs:
+  build-and-deploy:
+    environment: env
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
+
+      # Step 3: Build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest" .
+
+      # Step 4: Push Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: |
+          docker push "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest"
+
+      # Step 5: Deploy to RunPod
+      - name: Deploy to RunPod
+        env:
+          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+          DOCKER_IMAGE: "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest"
+          RUNPOD_TEMPLATE_ID: ${{ vars.RUNPOD_TEMPLATE_ID }} 
+        run: |
+          # Define the payload for the RunPod API request
+          # Make API call to RunPod to start the container
+           curl --request POST \
+           --header 'content-type: application/json' \
+           --url 'https://api.runpod.io/graphql?api_key="${RUNPOD_API_KEY}' \
+           --data '{"query": " mutation { deployCpuPod( input: { cloudType: SECURE, containerDiskInGb: 10, dataCenterId: null, instanceId: \"cpu3c-2-4\", networkVolumeId: null, startJupyter: true, startSsh: true, templateId: \"${{env.RUNPOD_TEMPLATE_ID}}\", volumeKey: null, env: [{key: \"a\", value: \"1\"}, {key: \"b\", value: \"2\"}] }) { id, machineId }}"}'

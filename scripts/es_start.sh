@@ -7,8 +7,8 @@ check_env_variable() {
     fi
 }
 
-check_env_variable "RUNPOD_TCP_PORT_70001" $RUNPOD_TCP_PORT_70001
-check_env_variable "RUNPOD_TCP_PORT_70002" $RUNPOD_TCP_PORT_70002
+# check_env_variable "RUNPOD_TCP_PORT_70001" $RUNPOD_TCP_PORT_70001
+# check_env_variable "RUNPOD_TCP_PORT_70002" $RUNPOD_TCP_PORT_70002
 
 cd $HOME/elasticsearch/elasticsearch-8.14.2/
 # ./bin/elasticsearch -E http.port=$RUNPOD_TCP_PORT_70001 -E transport.port=$RUNPOD_TCP_PORT_70002

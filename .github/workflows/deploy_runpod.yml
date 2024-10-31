@@ -15,11 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Step 2: Deploy to RunPod
+      # Step 1: Deploy to RunPod
       - name: Deploy to RunPod
         env:
           RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
@@ -27,6 +23,6 @@ jobs:
         run: |
           # Define the payload for the RunPod API request
           # Make API call to RunPod to start the container
-           curl -X POST https://api.runpod.io/graphql?api_key=OR70Q4ET38RADPKXJ0Z9J5FSEYPQ0708YIREPSVM \
+           curl -X POST https://api.runpod.io/graphql?api_key=${RUNPOD_API_KEY} \
            -H "content-type: application/json" \
            -d '{"query": " mutation { deployCpuPod( input: { cloudType: SECURE, containerDiskInGb: 10, dataCenterId: null, instanceId: \"cpu3c-2-4\", networkVolumeId: null, startJupyter: true, startSsh: true, templateId: \"vpjlpywfj4\", volumeKey: null, env: [{key: \"a\", value: \"1\"}, {key: \"b\", value: \"2\"}] }) { id, machineId }}"}'

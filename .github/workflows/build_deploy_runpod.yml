@@ -2,9 +2,13 @@
 name: Build/Push Docker, Deploy to Runpod
 
 on:
-  push:
-    branches:
-      - main  # Trigger on pushes to the main branch; adjust as needed
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        required: true
+        description: log_level
+        default: warning
+      tags:
 
 jobs:
   build-and-deploy:

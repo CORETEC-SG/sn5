@@ -2,9 +2,13 @@
 name: Deploy to RunPod
 
 on:
-  push:
-    branches:
-      - main  # Trigger on pushes to the main branch; adjust as needed
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        required: true
+        description: loglevel
+        default: warning
+      tags:
 
 jobs:
   deploy_runpod:

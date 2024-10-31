@@ -37,6 +37,7 @@ jobs:
         env:
           RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
           DOCKER_IMAGE: "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest"
+          RUNPOD_TEMPLATE_ID: ${{ secrets.RUNPOD_TEMPLATE_ID }}
         run: |
           # Define the payload for the RunPod API request
           read -r -d '' PAYLOAD << EOF
@@ -59,7 +60,7 @@ jobs:
           EOF
 
           # Make API call to RunPod to start the container
-          curl -X POST "https://api.runpod.io/v1/pods" \
-            -H "Authorization: Bearer $RUNPOD_API_KEY" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD"
+           curl --request POST \
+           --header 'content-type: application/json' \
+           --url 'https://api.runpod.io/graphql?api_key="${RUNPOD_API_KEY}' \
+           --data '{"query": " mutation { deployCpuPod( input: { cloudType: SECURE, containerDiskInGb: 10, dataCenterId: null, instanceId: \"cpu3c-2-4\", networkVolumeId: null, startJupyter: true, startSsh: true, templateId: ${RUNPOD_TEMPLATE_ID}, volumeKey: null, env: [{key: \"a\", value: \"1\"}, {key: \"b\", value: \"2\"}] }) { id, machineId }}"}'

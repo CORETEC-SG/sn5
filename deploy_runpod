@@ -1,0 +1,49 @@
+# .github/workflows/deploy-to-runpod.yml
+name: Deploy to RunPod
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch; adjust as needed
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Deploy to RunPod
+      - name: Deploy to RunPod
+        env:
+          RUNPOD_API_KEY: ${{ secrets.RUNPOD_API_KEY }}
+          DOCKER_IMAGE: "${{ secrets.DOCKERHUB_USERNAME }}/sn5:latest"
+          RUNPOD_TEMPLATE_ID: ${{ secrets.RUNPOD_TEMPLATE_ID }}
+        run: |
+          # Define the payload for the RunPod API request
+          read -r -d '' PAYLOAD << EOF
+          {
+            "image": "${DOCKER_IMAGE}",
+            "instance_type": "cpu",  # Example instance type, adjust as needed
+            "environment_variables": {
+              "MINER_ID"="default",
+              "WALLET_NAME"="test",
+              "OPENAI_API_KEY"="123456"
+            },
+            "command": "",  # Modify to fit your app's entry point
+            "ports": [
+              {
+                "container_port": 70000,
+                "host_port": 70000
+              }
+            ]
+          }
+          EOF
+
+          # Make API call to RunPod to start the container
+           curl --request POST \
+           --header 'content-type: application/json' \
+           --url 'https://api.runpod.io/graphql?api_key="${RUNPOD_API_KEY}' \
+           --data '{"query": " mutation { deployCpuPod( input: { cloudType: SECURE, containerDiskInGb: 10, dataCenterId: null, instanceId: \"cpu3c-2-4\", networkVolumeId: null, startJupyter: true, startSsh: true, templateId: ${RUNPOD_TEMPLATE_ID}, volumeKey: null, env: [{key: \"a\", value: \"1\"}, {key: \"b\", value: \"2\"}] }) { id, machineId }}"}'

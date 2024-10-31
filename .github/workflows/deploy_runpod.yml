@@ -12,6 +12,7 @@ on:
 
 jobs:
   deploy_runpod:
+    environment: env
     runs-on: ubuntu-latest
 
     steps:

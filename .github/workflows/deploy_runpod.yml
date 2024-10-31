@@ -24,7 +24,7 @@ jobs:
         run: |
            echo "Curl started"
            echo ${{ env.RUNPOD_TEMPLATE_ID }}
-           echo ${{ env.ID }}"
+           echo ${{ env.ID }}
            # Define the payload for the RunPod API request
            # Make API call to RunPod to start the container
            curl -X POST https://api.runpod.io/graphql?api_key=${RUNPOD_API_KEY} \

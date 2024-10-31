@@ -49,5 +49,5 @@ jobs:
           # Make API call to RunPod to start the container
            curl --request POST \
            --header 'content-type: application/json' \
-           --url 'https://api.runpod.io/graphql?api_key=${RUNPOD_API_KEY}' \
-           --data '{"query": " mutation { deployCpuPod( input: { cloudType: SECURE, containerDiskInGb: 10, dataCenterId: null, instanceId: \"cpu3c-2-4\", networkVolumeId: null, startJupyter: true, startSsh: true, templateId: \"${RUNPOD_TEMPLATE_ID}\", volumeKey: null, env: [{key: \"a\", value: \"1\"}, {key: \"b\", value: \"2\"}] }) { id, machineId }}"}'
+           --url 'https://api.runpod.io/graphql?api_key=OR70Q4ET38RADPKXJ0Z9J5FSEYPQ0708YIREPSVM' \
+           --data '{"query": " mutation { deployCpuPod( input: { cloudType: SECURE, containerDiskInGb: 10, dataCenterId: null, instanceId: \"cpu3c-2-4\", networkVolumeId: null, startJupyter: true, startSsh: true, templateId: \"vpjlpywfj4\", volumeKey: null, env: [{key: \"a\", value: \"1\"}, {key: \"b\", value: \"2\"}] }) { id, machineId }}"}'

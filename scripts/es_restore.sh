@@ -15,4 +15,6 @@ curl -u elastic:$ELASTICSEARCH_PASSWORD -k -X POST "https://localhost:9200/_snap
   "rename_replacement": "restored_index_$1"
 }'
 
+curl -u elastic:$ELASTICSEARCH_PASSWORD -k -H "Content-Type: application/json" -X PUT https://localhost:9200/*/_settings -d '{"number_of_replicas":0}'
+
 echo "ELASTICSEARCH RESTORE DONE!"

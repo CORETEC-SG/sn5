@@ -8,7 +8,7 @@ source $HOME/scripts/es_pwd_set.sh
 
 source $HOME/scripts/es_restore.sh
 
-cp $HOME/scripts/vector_index_eth_denver_dataset.py  $HOME/openkaito/scripts/vector_index_eth_denver_dataset.py
+cp $HOME/scripts/vector_index_eth_*.py  $HOME/openkaito/scripts/
 
 pm2 start $HOME/pm2.json
 

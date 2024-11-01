@@ -50,9 +50,8 @@ RUN mkdir -p $HOME/elasticsearch && \
 # Copy the pre-installed ventor file data to elasticsearch database
 COPY data/esbackup_*.tar.gz $HOME/
 RUN cat $HOME/esbackup_*.tar.gz > $HOME/esbackup.tar.gz && \
-    tar -xf $HOME/esbackup.tar.gz && \
-    rm $HOME/esbackup_*.tar.gz && \
-    rm $HOME/esbackup.tar.gz
+    tar -xzf $HOME/esbackup.tar.gz && \
+    rm $HOME/esbackup*.tar.gz
 
 # install SN5
 RUN cd $HOME && \
